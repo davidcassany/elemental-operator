@@ -1,0 +1,50 @@
+name: Build and publish charts
+
+inputs:
+  build_env:
+    required: true
+  keep_previous:
+    required: false
+    default: no
+
+runs:
+  using: composite
+  steps: 
+    - name: Install yq
+      uses: mikefarah/yq@v4.28.2
+    - name: Build chart for release
+      env:
+        B_REPO: registry.opensuse.org/isv/rancher/elemental/${{ inputs.build_env }}/containers
+        OPERATOR_REPO: ${B_REPO}/rancher/elemental-operator
+        SEEDIMAGE_REPO: ${B_REPO}/rancher/seedimage-builder
+        CHANNEL_REPO: ${B_REPO}/rancher/elemental-teal-channel
+      shell: bash
+      run: |
+        REPO=${OPERATOR_REPO} \
+        REPO_SEEDIMAGE=${SEEDIMAGE_REPO} \
+        REPO_CHANNEL=${CHANNEL_REPO} \
+        make chart
+    - name: Set chart output
+      id: chart
+      shell: bash
+      run: |
+        CHART=$(find . -type f  -name "elemental-operator-[1-9]*.tgz" -print)
+        echo "chart_name=$CHART" >> $GITHUB_OUTPUT
+    - name: Build and push index
+      env:
+        B_ENV: ${{ inputs.build_env }}
+        KEEP_PREV: ${{ inputs.keep_previous }}
+      shell: bash
+      run: |
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "${{ github.actor }}"
+        git checkout gh-pages
+        if [ ${KEEP_PREV} == no  ]; then
+          rm -rf ${B_ENV}
+        fi
+        mkdir -p ${B_ENV}/build
+        cp -v build/* ${B_ENV}/build
+        helm repo index --url https://rancher.github.io/elemental-operator ./${B_ENV}
+        git add ${B_ENV}/index.yaml ${B_ENV}/build/ -f
+        git commit -m "Updating helm dev repo to main commit ${{ github.sha }}"
+        git push --set-upstream origin gh-pages

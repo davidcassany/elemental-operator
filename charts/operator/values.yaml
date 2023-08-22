@@ -1,13 +1,17 @@
 image:
   empty: rancher/pause:3.1
-  repository: "quay.io/costoolkit/elemental-operator"
+  repository: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-operator
   tag: latest
   imagePullPolicy: IfNotPresent
 
 seedImage:
-  repository: "quay.io/costoolkit/seedimage-builder"
+  repository: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/seedimage-builder
   tag: latest
   imagePullPolicy: IfNotPresent
+
+channel:
+  repository: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal-channel 
+  tag: latest
 
 # number of operator replicas to deploy
 replicas: 1

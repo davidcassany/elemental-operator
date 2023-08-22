@@ -1,0 +1,36 @@
+name: Build, publish and release stable charts
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
+
+jobs:
+  stable-charts:
+    needs: dev-charts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag }}
+      - name: Build and publish charts
+        uses: "./.github/actions/chart"
+        with:
+          build_env: stable
+          keep_previous: yes
+      - name: create release
+        uses: ncipollo/release-action@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: true
+          generateReleaseNotes: true
+          artifacts: "build/*"
+          updateOnlyUnreleased: true
+          allowUpdates: true
