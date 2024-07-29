@@ -15,6 +15,7 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+# These variables are coupled to builder scripts
 %define commit _replaceme_
 %define c_date _replaceme_
 
