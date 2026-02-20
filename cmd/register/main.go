@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 - 2025 SUSE LLC
+Copyright © 2022 - 2026 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/jaypipes/ghw"
@@ -229,6 +231,7 @@ func initConfig(fs vfs.FS) error {
 	// Set final config path
 	log.Infof("Using base configuration file: %s", configPath)
 	viper.SetConfigFile(configPath)
+	viper.SetConfigType(strings.TrimLeft(filepath.Ext(configPath), "."))
 	// Merge config (considering bound flags)
 	if err := viper.MergeInConfig(); err != nil {
 		return fmt.Errorf("merging config: %w", err)

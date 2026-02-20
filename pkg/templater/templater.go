@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 - 2025 SUSE LLC
+Copyright © 2022 - 2026 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"errors"
 	"strings"
 
-	values "github.com/rancher/wrangler/v2/pkg/data"
+	values "github.com/rancher/wrangler/v3/pkg/data"
 )
 
 var errValueNotFound = errors.New("value not found")
