@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 - 2025 SUSE LLC
+Copyright © 2022 - 2026 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -60,6 +60,9 @@ type ManagedOSVersionChannelReconciler struct {
 	OperatorImage string
 	// syncerProvider is mostly an interface to facilitate unit tests
 	syncerProvider syncer.Provider
+	// skipNameValidation is used to allow initiating multiple controllers
+	// of the same type in unit tests
+	skipNameValidation *bool
 }
 
 // +kubebuilder:rbac:groups=elemental.cattle.io,resources=managedosversionchannels,verbs=get;list;watch;create;update;patch;delete
@@ -79,7 +82,8 @@ func (r *ManagedOSVersionChannelReconciler) SetupWithManager(mgr ctrl.Manager) e
 	}
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(controller.Options{
-			RateLimiter: workqueue.NewItemExponentialFailureRateLimiter(baseRateTime, maxDelayTime),
+			SkipNameValidation: r.skipNameValidation,
+			RateLimiter:        workqueue.NewTypedItemExponentialFailureRateLimiter[reconcile.Request](baseRateTime, maxDelayTime),
 		}).
 		For(&elementalv1.ManagedOSVersionChannel{}).
 		Owns(&corev1.Pod{}).

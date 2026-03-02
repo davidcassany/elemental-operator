@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 - 2025 SUSE LLC
+Copyright © 2022 - 2026 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -566,9 +567,10 @@ var _ = Describe("managed os version channel controller integration tests", func
 		syncerProvider = &ctrlHelpers.FakeSyncerProvider{}
 		syncerProvider.SetJSON(syncJSON)
 		r = &ManagedOSVersionChannelReconciler{
-			Client:         cl,
-			syncerProvider: syncerProvider,
-			OperatorImage:  "test/image:latest",
+			Client:             cl,
+			syncerProvider:     syncerProvider,
+			OperatorImage:      "test/image:latest",
+			skipNameValidation: ptr.To(true),
 		}
 		Expect(r.SetupWithManager(mgr)).To(Succeed())
 
